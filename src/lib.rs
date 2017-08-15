@@ -3,4 +3,4 @@
 //!
 //! Ultimately we will implement the [Schreier-Sims algorithm](https://en.wikipedia.org/wiki/Schreier%E2%80%93Sims_algorithm).
 
-mod group;
+pub mod group;
