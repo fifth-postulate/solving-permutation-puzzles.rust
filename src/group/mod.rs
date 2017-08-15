@@ -71,6 +71,23 @@ impl GroupElement for Permutation {
     }
 }
 
+/// A group can _act_ on a set. (See [Group Action](https://en.wikipedia.org/wiki/Group_action)).
+pub trait GroupAction {
+    /// The set the group acts on.
+    type Domain;
+
+    /// The action that the group has on the domain.
+    fn act_on(&self, element: &Self::Domain) -> Self::Domain;
+}
+
+impl GroupAction for Permutation {
+    type Domain = u64;
+
+    fn act_on(&self, original: &u64) -> u64 {
+        self.images.get(&original).unwrap_or(&original).clone()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
@@ -131,5 +148,18 @@ mod tests {
         let product = first.times(&second);
 
         assert!(product.is_identity());
+    }
+
+    #[test]
+    fn permutation_should_act_upon_integers() {
+        let mut permutation_images = HashMap::new();
+        permutation_images.insert(0u64, 1u64);
+        permutation_images.insert(1u64, 2u64);
+        permutation_images.insert(2u64, 0u64);
+        let permutation = Permutation::new(permutation_images);
+
+        assert_eq!(permutation.act_on(&0u64), 1u64);
+        assert_eq!(permutation.act_on(&1u64), 2u64);
+        assert_eq!(permutation.act_on(&2u64), 0u64);
     }
 }
