@@ -9,6 +9,7 @@
 //!    _G_ such that _g_ * _h_ = _e_, the identity element in _G_.
 
 pub mod permutation;
+pub mod free;
 
 use std::hash::Hash;
 use std::collections::HashMap;

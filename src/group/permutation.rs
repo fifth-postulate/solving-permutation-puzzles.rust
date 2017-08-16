@@ -29,7 +29,7 @@ impl GroupElement for Permutation {
             let image = self.images.get(&original).unwrap_or(&original).clone();
             if image != original {
                 return false
-            } 
+            }
         }
         true
     }
@@ -84,7 +84,7 @@ impl Display for Permutation {
         } else {
             write!(f, "Id")
         }
-    }   
+    }
 }
 
 fn cycles(n: usize, images: &HashMap<u64, u64>) -> Vec<Vec<u64>> {
