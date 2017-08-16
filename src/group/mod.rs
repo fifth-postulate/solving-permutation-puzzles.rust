@@ -52,6 +52,16 @@ impl<Domain, G> BaseStrongGeneratorLevel<Domain, G>
             stabilizers: stabilizers,
         }
     }
+
+    fn has_transversal_for(&self, g: &G) -> bool {
+        let image = g.act_on(&self.base);
+        self.transversal.contains_key(&image)
+    }
+
+    fn transversal_for(&self, g: &G) -> Option<&G> {
+        let image = g.act_on(&self.base);
+        self.transversal.get(&image)
+    }
 }
 
 
