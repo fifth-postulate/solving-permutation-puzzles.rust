@@ -10,6 +10,10 @@
 
 pub mod permutation;
 
+use std::hash::Hash;
+use std::collections::HashMap;
+use std::collections::VecDeque;
+
 /// The contract for a group element.
 pub trait GroupElement {
     /// Determine if the group element is the identity.
@@ -27,4 +31,58 @@ pub trait GroupAction {
 
     /// The action that the group has on the domain.
     fn act_on(&self, element: &Self::Domain) -> Self::Domain;
+}
+
+
+struct BaseStrongGeneratorLevel<Domain, G> where G: GroupElement + GroupAction<Domain=Domain> {
+    base: Domain,
+    generators: Vec<G>,
+    transversal: HashMap<Domain, G>,
+    stabilizers: Vec<G>,
+}
+
+impl<Domain, G> BaseStrongGeneratorLevel<Domain, G>
+    where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> {
+    fn new(base: Domain, generators: Vec<G>) -> BaseStrongGeneratorLevel<Domain, G> {
+        let (transversal, stabilizers) = calculate_transversal(base.clone(), &generators);
+        BaseStrongGeneratorLevel {
+            base: base,
+            generators: generators,
+            transversal: transversal,
+            stabilizers: stabilizers,
+        }
+    }
+}
+
+
+fn calculate_transversal<Domain, G>(base: Domain, generators: &Vec<G>) -> (HashMap<Domain, G>, Vec<G>)
+    where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> {
+    let mut to_visit: VecDeque<Domain> = VecDeque::new();
+    let mut transversals: HashMap<Domain, G> = HashMap::new();
+    let mut stabilizers: Vec<G> = vec!();
+    to_visit.push_back(base.clone());
+    transversals.insert(base.clone(), identity(&generators));
+    while !to_visit.is_empty() {
+        let element = to_visit.pop_front().unwrap();
+        for ref generator in generators {
+            let image = generator.act_on(&element);
+            if !transversals.contains_key(&image) {
+                let transversal = transversals.get(&element).unwrap().times(&generator);
+                transversals.insert(image.clone(), transversal);
+                to_visit.push_back(image.clone());
+            } else {
+                let to = transversals.get(&element).unwrap();
+                let fro = transversals.get(&image).unwrap().inverse();
+                let stabilizer = to.times(&generator).times(&fro);
+                stabilizers.push(stabilizer);
+            }
+        }
+    }
+    (transversals, stabilizers)
+}
+
+fn identity<G>(generators: &Vec<G>) -> G where G: GroupElement {
+    let g = generators.get(0).expect("at least one generator");
+    let inverse = g.inverse();
+    g.times(&inverse)
 }
