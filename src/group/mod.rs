@@ -10,6 +10,7 @@
 
 pub mod permutation;
 pub mod free;
+pub mod tree;
 
 use std::hash::Hash;
 use std::collections::HashMap;
