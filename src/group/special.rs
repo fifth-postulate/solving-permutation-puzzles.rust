@@ -5,10 +5,11 @@ use super::tree::SLP;
 use super::permutation::Permutation;
 use super::free::Word;
 
-/// A special product of a `SLP` and a `Permutation`
+/// A special product of a `SLP` and a `Permutation`.
 #[derive(Debug, PartialEq)]
 pub struct SLPPermutation {
-    element : (SLP, Permutation),
+    /// The product of a SLP and a Permutation.
+    pub element : (SLP, Permutation),
 }
 
 impl SLPPermutation {
@@ -19,12 +20,7 @@ impl SLPPermutation {
 
     /// Map the `SLPPermutation` in to a `Word` according to the `Morphism`.
     pub fn transform(&self, morphism: &Morphism<SLP, Word>) -> Word {
-        match self.element.0 {
-            SLP::Identity => Word::identity(),
-            ref g @ SLP::Generator(_) => morphism.transform(&g),
-            SLP::Product(ref left, ref right) => morphism.transform(&left).times(&morphism.transform(&right)),
-            SLP::Inverse(ref g) => morphism.transform(&g).inverse(),
-        }
+        self.element.0.transform(&morphism)
     }
 }
 

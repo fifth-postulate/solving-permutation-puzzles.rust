@@ -70,7 +70,8 @@ impl<Domain, G> Group<Domain, G>
         candidate.is_identity()
     }
 
-    fn strip(&self, element: G) -> G {
+    /// Strip element with current group
+    pub fn strip(&self, element: G) -> G {
         let mut candidate = element;
         for level in &self.levels {
             if level.has_transversal_for(&candidate) {

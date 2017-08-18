@@ -4,7 +4,8 @@
 
 use std::fmt;
 use std::fmt::Display;
-use super::{GroupElement};
+use super::{GroupElement, Morphism};
+use super::free::Word;
 
 /// Single Line Program (SLP) references various elements to form a expression
 /// That can be evaluated to actual group elements.
@@ -18,6 +19,18 @@ pub enum SLP {
     Product(Box<SLP>, Box<SLP>),
     /// Inverse of a SLP.
     Inverse(Box<SLP>),
+}
+
+impl SLP {
+    /// Map the `SLP` in to a `Word` according to the `Morphism`.
+    pub fn transform(&self, morphism: &Morphism<SLP, Word>) -> Word {
+        match *self {
+            SLP::Identity => Word::identity(),
+            ref g @ SLP::Generator(_) => morphism.transform(&g),
+            SLP::Product(ref left, ref right) => (*left).transform(&morphism).times(&(*right).transform(&morphism)),
+            SLP::Inverse(ref g) => (*g).transform(&morphism).inverse(),
+        }
+    }
 }
 
 impl GroupElement for SLP {
@@ -47,7 +60,7 @@ impl Display for SLP {
             SLP::Product(ref left, ref right) => write!(f, "({}) * ({})", left, right),
             SLP::Inverse(ref term) => write!(f, "({})^-1", term),
         }
-    } 
+    }
 }
 
 #[cfg(test)]
