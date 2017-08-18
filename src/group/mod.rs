@@ -162,6 +162,13 @@ fn identity<G>(generators: &Vec<G>) -> G where G: GroupElement {
     g.times(&inverse)
 }
 
+/// Morphism maps one Group to the other with respect of the group operation.
+pub struct Morphism<G, H>
+    where G: GroupElement + Eq + Hash, H: GroupElement + Eq + Hash {
+    generator_images: HashMap<G, H>
+}
+
+
 
 #[cfg(test)]
 mod tests {
