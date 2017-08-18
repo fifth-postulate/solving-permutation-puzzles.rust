@@ -8,7 +8,7 @@ use super::{GroupElement};
 
 /// Single Line Program (SLP) references various elements to form a expression
 /// That can be evaluated to actual group elements.
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub enum SLP {
     /// The identity element of a SLP.
     Identity,

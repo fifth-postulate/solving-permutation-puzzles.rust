@@ -6,7 +6,7 @@ use std::fmt::Display;
 use super::GroupElement;
 
 /// The element of a free group.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct Word {
     terms: Vec<(char, i64)>,
 }

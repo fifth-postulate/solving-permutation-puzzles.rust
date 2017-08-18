@@ -170,10 +170,16 @@ pub struct Morphism<G, H>
 }
 
 impl<G, H> Morphism<G, H>
-    where G: GroupElement + Eq + Hash, H: GroupElement + Eq + Hash {
+    where G: GroupElement + Eq + Hash, H: GroupElement + Eq + Hash + Clone {
     /// Create a new morphism with a given set of images
     pub fn new(generator_images: HashMap<G, H>) -> Morphism<G, H> {
         Morphism { generator_images: generator_images }
+    }
+
+
+    /// maps an G-element to the corresponding H-element.
+    pub fn transform(&self, element: &G) -> H {
+        self.generator_images.get(element).expect("should have an image").clone()
     }
 }
 
