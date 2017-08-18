@@ -168,7 +168,13 @@ pub struct Morphism<G, H>
     generator_images: HashMap<G, H>
 }
 
-
+impl<G, H> Morphism<G, H>
+    where G: GroupElement + Eq + Hash, H: GroupElement + Eq + Hash {
+    /// Create a new morphism with a given set of images
+    pub fn new(generator_images: HashMap<G, H>) -> Morphism<G, H> {
+        Morphism { generator_images: generator_images }
+    }
+}
 
 #[cfg(test)]
 mod tests {
