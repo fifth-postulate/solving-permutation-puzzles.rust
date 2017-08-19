@@ -1,3 +1,4 @@
+#[macro_use]
 extern crate permutation;
 
 use std::collections::HashMap;
@@ -10,16 +11,16 @@ use permutation::group::permutation::Permutation;
 fn main() {
     let group = s6();
 
-    let mut element_images = HashMap::new();
-    element_images.insert(0u64, 1u64);
-    element_images.insert(1u64, 0u64);
-    element_images.insert(2u64, 5u64);
-    element_images.insert(3u64, 4u64);
-    element_images.insert(4u64, 3u64);
-    element_images.insert(5u64, 2u64);
     let element = SLPPermutation::new(
         SLP::Identity,
-        Permutation::new(element_images)
+        permute!(
+            0, 1,
+            1, 0,
+            2, 5,
+            3, 4,
+            4, 3,
+            5, 2
+        ),
     );
 
     let stripped = group.strip(element);
@@ -35,28 +36,28 @@ fn main() {
 }
 
 fn s6() -> Group<u64, SLPPermutation> {
-    let mut transposition_images = HashMap::new();
-    transposition_images.insert(0u64, 1u64);
-    transposition_images.insert(1u64, 0u64);
-    transposition_images.insert(2u64, 2u64);
-    transposition_images.insert(3u64, 3u64);
-    transposition_images.insert(4u64, 4u64);
-    transposition_images.insert(5u64, 5u64);
     let transposition = SLPPermutation::new(
         SLP::Generator(0),
-        Permutation::new(transposition_images)
+        permute!(
+            0, 1,
+            1, 0,
+            2, 2,
+            3, 3,
+            4, 4,
+            5, 5
+        ),
     );
 
-    let mut rotation_images = HashMap::new();
-    rotation_images.insert(0u64, 1u64);
-    rotation_images.insert(1u64, 2u64);
-    rotation_images.insert(2u64, 3u64);
-    rotation_images.insert(3u64, 4u64);
-    rotation_images.insert(4u64, 5u64);
-    rotation_images.insert(5u64, 0u64);
     let rotation = SLPPermutation::new(
         SLP::Generator(1),
-        Permutation::new(rotation_images)
+        permute!(
+            0, 1,
+            1, 2,
+            2, 3,
+            3, 4,
+            4, 5,
+            5, 0
+        ),
     );
 
     let gset = vec!(0u64, 1u64, 2u64, 3u64, 4u64, 5u64);

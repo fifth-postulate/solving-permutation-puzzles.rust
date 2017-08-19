@@ -1,3 +1,4 @@
+#[macro_use]
 extern crate permutation;
 
 use std::collections::HashMap;
@@ -7,36 +8,35 @@ use permutation::group::permutation::Permutation;
 fn main() {
     let group = d6();
 
-    let mut element_images = HashMap::new();
-    element_images.insert(0u64, 1u64);
-    element_images.insert(1u64, 0u64);
-    element_images.insert(2u64, 5u64);
-    element_images.insert(3u64, 4u64);
-    element_images.insert(4u64, 3u64);
-    element_images.insert(5u64, 2u64);
-    let element = Permutation::new(element_images);
+    let element = permute!(
+        0, 1,
+        1, 0,
+        2, 5,
+        3, 4,
+        4, 3,
+        5, 2);
 
     println!("{0} a member", group.is_member(element));
 }
 
 fn d6() -> Group<u64, Permutation> {
-    let mut transposition_images = HashMap::new();
-    transposition_images.insert(0u64, 1u64);
-    transposition_images.insert(1u64, 0u64);
-    transposition_images.insert(2u64, 5u64);
-    transposition_images.insert(3u64, 4u64);
-    transposition_images.insert(4u64, 3u64);
-    transposition_images.insert(5u64, 2u64);
-    let transposition = Permutation::new(transposition_images);
+    let transposition = permute!(
+        0u64, 1u64,
+        1u64, 0u64,
+        2u64, 5u64,
+        3u64, 4u64,
+        4u64, 3u64,
+        5u64, 2u64
+    );
 
-    let mut rotation_images = HashMap::new();
-    rotation_images.insert(0u64, 1u64);
-    rotation_images.insert(1u64, 2u64);
-    rotation_images.insert(2u64, 3u64);
-    rotation_images.insert(3u64, 4u64);
-    rotation_images.insert(4u64, 5u64);
-    rotation_images.insert(5u64, 0u64);
-    let rotation = Permutation::new(rotation_images);
+    let rotation = permute!(
+        0u64, 1u64,
+        1u64, 2u64,
+        2u64, 3u64,
+        3u64, 4u64,
+        4u64, 5u64,
+        5u64, 0u64
+    );
 
     let gset = vec!(0u64, 1u64, 2u64, 3u64, 4u64, 5u64);
     let generators = vec!(transposition, rotation);
