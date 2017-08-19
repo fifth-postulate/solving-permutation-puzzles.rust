@@ -3,7 +3,7 @@ extern crate permutation;
 
 use std::collections::HashMap;
 use permutation::group::{Group, GroupElement, Morphism};
-use permutation::group::special:: SLPPermutation;
+use permutation::group::special::SLPPermutation;
 use permutation::group::tree::SLP;
 use permutation::group::free::Word;
 use permutation::group::permutation::Permutation;
@@ -25,10 +25,7 @@ fn main() {
 
     let stripped = group.strip(element);
 
-    let mut generator_images = HashMap::new();
-    generator_images.insert(SLP::Generator(0), Word::generator('t'));
-    generator_images.insert(SLP::Generator(1), Word::generator('r'));
-    let morphism = Morphism::new(generator_images);
+    let morphism = morphism!(0, 't', 1, 'r');
 
     println!("{0} {1}",
              stripped.element.1.inverse(),
