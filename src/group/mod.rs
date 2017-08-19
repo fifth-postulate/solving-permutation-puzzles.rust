@@ -164,6 +164,19 @@ fn identity<G>(generators: &Vec<G>) -> G where G: GroupElement {
     g.times(&inverse)
 }
 
+#[macro_export]
+macro_rules! morphism {
+    ( $($from: expr, $to: expr),* ) => {
+        {
+            let mut morphism_images = HashMap::new();
+            $(
+                morphism_images.insert(SLP::Generator($from), Word::generator($to));
+            )*
+            Morphism::new(morphism_images)
+        }
+    }
+}
+
 /// Morphism maps one Group to the other with respect of the group operation.
 pub struct Morphism<G, H>
     where G: GroupElement + Eq + Hash, H: GroupElement + Eq + Hash {
