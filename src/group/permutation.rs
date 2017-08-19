@@ -7,6 +7,19 @@ use std::fmt;
 use std::fmt::Display;
 use super::{GroupElement, GroupAction};
 
+#[macro_export]
+macro_rules! permute {
+    ( $($from: expr, $to: expr),* ) => {
+        {
+            let mut permutation_images = HashMap::new();
+            $(
+                permutation_images.insert($from, $to);
+            )*
+            Permutation::new(permutation_images)
+        }
+    }
+}
+
 /// A permutation of there set 0..n for a suitable choice of n.
 #[derive(Debug, PartialEq)]
 pub struct Permutation {
