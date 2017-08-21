@@ -1,7 +1,7 @@
 [package]
 descriptions = "Do calculations with groups"
 name = "permutation"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Daan van Berkel <daan.v.berkel.1980@gmail.com>"]
 license = "MIT"
 
