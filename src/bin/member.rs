@@ -1,9 +1,9 @@
 #[macro_use]
-extern crate permutation;
+extern crate permutation_rs;
 
 use std::collections::HashMap;
-use permutation::group::{Group};
-use permutation::group::permutation::Permutation;
+use permutation_rs::group::{Group};
+use permutation_rs::group::permutation::Permutation;
 
 fn main() {
     let group = d6();

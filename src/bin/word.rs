@@ -1,12 +1,12 @@
 #[macro_use]
-extern crate permutation;
+extern crate permutation_rs;
 
 use std::collections::HashMap;
-use permutation::group::{Group, GroupElement, Morphism};
-use permutation::group::special::SLPPermutation;
-use permutation::group::tree::SLP;
-use permutation::group::free::Word;
-use permutation::group::permutation::Permutation;
+use permutation_rs::group::{Group, GroupElement, Morphism};
+use permutation_rs::group::special::SLPPermutation;
+use permutation_rs::group::tree::SLP;
+use permutation_rs::group::free::Word;
+use permutation_rs::group::permutation::Permutation;
 
 fn main() {
     let group = s6();
