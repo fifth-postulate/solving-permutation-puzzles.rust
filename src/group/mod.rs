@@ -12,6 +12,7 @@ pub mod permutation;
 pub mod free;
 pub mod tree;
 pub mod special;
+pub mod calculation;
 
 use std::hash::Hash;
 use std::collections::HashMap;

@@ -21,7 +21,7 @@ macro_rules! permute {
 }
 
 /// A permutation of there set 0..n for a suitable choice of n.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Permutation {
     n: usize,
     images: HashMap<u64, u64>,
