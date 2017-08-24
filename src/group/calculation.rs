@@ -34,6 +34,16 @@ fn identity(generators: &Vec<Permutation>) -> Permutation {
     a_generator.times(&a_generator.inverse())
 }
 
+
+/// Calculate the nth factorial number.
+///
+/// The n! is defined as n * (n-1) * ... * 1
+pub fn fact(n: u64) -> u64 {
+    (1..n)
+        .map(|n| n + 1)
+        .fold(1u64, |acc, n| acc * n)
+}
+
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
@@ -55,5 +65,13 @@ mod tests {
         assert!(elements.contains(&id));
         assert!(elements.contains(&rotation));
         assert!(elements.contains(&rotation.inverse()));
+    }
+
+    #[test]
+    fn factorial() {
+        assert_eq!(fact(1), 1);
+        assert_eq!(fact(2), 2);
+        assert_eq!(fact(3), 6);
+        assert_eq!(fact(4), 24);
     }
 }
