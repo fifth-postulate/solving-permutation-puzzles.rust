@@ -38,8 +38,8 @@ fn identity(generators: &Vec<Permutation>) -> Permutation {
 /// Calculate the nth factorial number.
 ///
 /// The n! is defined as n * (n-1) * ... * 1
-pub fn fact(n: u64) -> u64 {
-    (1..n)
+pub fn fact(m: u64) -> u64 {
+    (1..m)
         .map(|n| n + 1)
         .fold(1u64, |acc, n| acc * n)
 }
