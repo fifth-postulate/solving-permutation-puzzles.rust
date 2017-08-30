@@ -100,15 +100,21 @@ fn find_base<Domain, G>(gset: &Vec<Domain>, generators: &Vec<G>) -> Option<Domai
     None
 }
 
-struct BaseStrongGeneratorLevel<Domain, G>
+/// A level in the Schreier-Sims Base Strong generator algorithm.
+///
+/// It can be used to sift
+pub struct BaseStrongGeneratorLevel<Domain, G>
     where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> {
-    base: Domain,
+    /// The base element for this level.
+    pub base: Domain,
+    /// The transversals for the orbit of the base.
     transversal: HashMap<Domain, G>,
 }
 
 impl<Domain, G> BaseStrongGeneratorLevel<Domain, G>
     where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> {
-    fn new(base: Domain, generators: &Vec<G>) -> (BaseStrongGeneratorLevel<Domain, G>, Vec<G>) {
+    /// Create a BaseStrongGeneratorLevel with a known base and generators.
+    pub fn new(base: Domain, generators: &Vec<G>) -> (BaseStrongGeneratorLevel<Domain, G>, Vec<G>) {
         let (transversal, stabilizers) = calculate_transversal(base.clone(), &generators);
         (
             BaseStrongGeneratorLevel  {
@@ -119,12 +125,14 @@ impl<Domain, G> BaseStrongGeneratorLevel<Domain, G>
         )
     }
 
-    fn has_transversal_for(&self, g: &G) -> bool {
+    /// Determine if this levels base is acted upon by `g` in a way compatible for this level.
+    pub fn has_transversal_for(&self, g: &G) -> bool {
         let image = g.act_on(&self.base);
         self.transversal.contains_key(&image)
     }
 
-    fn transversal_for(&self, g: &G) -> Option<&G> {
+    /// The transversal corresponding with `g`.
+    pub fn transversal_for(&self, g: &G) -> Option<&G> {
         let image = g.act_on(&self.base);
         self.transversal.get(&image)
     }
