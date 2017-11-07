@@ -154,5 +154,38 @@ t^1r^4t^-1r^-1t^-1r^1t^1r^1
 
 Which solves our puzzle.
 
+## What is an SLPPermutation? 
+We said before that an `SLPPermutation` is the combination of a `SLP` and a
+`Permutaiton`. If we learn what these individual concepts mean, we get an
+insight into the combination.
+
+### What is an permutation?
+A permutation is a bijection from one set to the other. Basically it sends every
+element of a set for example `0, 1, 2` to an element of that set. For example
+
+```text
+0 -> 1
+1 -> 2
+2 -> 0
+```
+
+### What is an SLP?
+`SLP` is short for [_straight line program_][slp]. It is an description of a
+calculation which can be performed with other group elements. The implementation
+used in this project deviate a little from more traditional programs. It is more
+akin a [_Abstract Syntax Tree_][ast].
+
+For example, the following representation of a `SLP`,
+
+```text
+(Product
+  (Generator 0)
+  (Inverse (Generator 1)))
+```
+
+together with a morphism that sends `Generator 0` to `(1 2)` and `Generator 1`
+to `(1 2 3)` corresponds with the permutation `(2 3)` 
 
 [brainbow]: http://fifth-postulate.nl/brainbow/
+[slp]: https://en.wikipedia.org/wiki/Straight-line_program
+[ast]: https://en.wikipedia.org/wiki/Abstract_syntax_tree
