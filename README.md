@@ -156,7 +156,7 @@ Which solves our puzzle.
 
 ## What is an SLPPermutation? 
 We said before that an `SLPPermutation` is the combination of a `SLP` and a
-`Permutaiton`. If we learn what these individual concepts mean, we get an
+`Permutation`. If we learn what these individual concepts mean, we get an
 insight into the combination.
 
 ### What is an permutation?
