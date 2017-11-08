@@ -1,6 +1,22 @@
 //! A free group are the sequence of symbols and their inverses where there are
 //! no occurrences of a symbol and its inverse next to each other.
-
+//!
+//! # Examples
+//! Words can be multiplied to form more complex words. For example, if we have
+//! the word `abc` and multiply it with `c^-1bc`, we expect the result to be
+//! `ab^2c`.
+//!
+//! ```rust
+//! # use permutation_rs::group::GroupElement;
+//! # use permutation_rs::group::free::Word;
+//! let left = Word::new(vec![('a', 1), ('b', 1), ('c', 1)]);
+//! let right = Word::new(vec![('c', -1), ('b', 1), ('c', 1)]);
+//!
+//! let answer = left.times(&right);
+//!
+//! let expected = Word::new(vec![('a', 1), ('b', 2), ('c', 1)]);
+//! assert_eq!(answer, expected);
+//! ```
 use std::fmt;
 use std::fmt::Display;
 use super::GroupElement;
