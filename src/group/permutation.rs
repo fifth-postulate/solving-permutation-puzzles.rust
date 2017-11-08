@@ -20,7 +20,7 @@ macro_rules! permute {
     }
 }
 
-/// A permutation of there set 0..n for a suitable choice of n.
+/// A permutation of the set 0..n for a suitable choice of n.
 #[derive(Debug, PartialEq, Clone)]
 pub struct Permutation {
     n: usize,

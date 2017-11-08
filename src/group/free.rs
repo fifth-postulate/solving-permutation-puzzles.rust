@@ -1,5 +1,5 @@
 //! A free group are the sequence of symbols and their inverses where there are
-//! no occurrences a symbol and its inverse.
+//! no occurrences of a symbol and its inverse next to each other.
 
 use std::fmt;
 use std::fmt::Display;

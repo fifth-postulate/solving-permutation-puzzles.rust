@@ -1,6 +1,6 @@
 //! The core of working with groups.
 //!
-//! A *group* is a set _G_ with an associated operation _G_*_G_ -> _G_ such that
+//! A *group* is a set _G_ with an associated operation _G_ * _G_ -> _G_ such that
 //! 1. The operation is associative. I.e. (_a_ * _b_) * _c_ = _a_ * (_b_ * _c_)
 //!    for all _a_, _b_, _c_ in _G_.
 //! 2. There exist an identity element. I.e. an _e_ in _G_ with _e_ * _g_ = _g_
