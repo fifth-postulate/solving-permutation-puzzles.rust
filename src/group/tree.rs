@@ -1,6 +1,32 @@
 //! In order to cut down on exponential growth of words when forming products
 //! we are creating the structure of a calculation. When actual calculations
 //! need to be done, we can use a morphism to determine the result.
+//!
+//! # Examples
+//! Below you find an example of how an `SLP` can be used.
+//!
+//! ```rust
+//! # #[macro_use] extern crate permutation_rs;
+//! # use std::collections::HashMap;
+//! # use permutation_rs::group::{GroupElement, Morphism};
+//! # use permutation_rs::group::tree::SLP;
+//! # use permutation_rs::group::free::Word;
+//! # fn main() {
+//! let left = SLP::Generator(0);
+//! let right = SLP::Generator(1);
+//! let expression = left.times(&right.inverse());
+//!
+//! let morphism = morphism!(
+//!     0, 'a',
+//!     1, 'b');
+//!
+//! let word = expression.transform(&morphism);
+//!
+//! let expected = Word::new(vec![('a', 1), ('b', -1)]);
+//!
+//! assert_eq!(word, expected);
+//! # }
+//! ```
 
 use std::fmt;
 use std::fmt::Display;
