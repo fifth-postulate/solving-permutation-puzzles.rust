@@ -18,6 +18,8 @@ use std::hash::Hash;
 use std::collections::HashMap;
 use std::collections::VecDeque;
 
+use self::calculation::identity;
+
 /// The contract for a group element.
 pub trait GroupElement {
     /// Determine if the group element is the identity.
@@ -165,12 +167,6 @@ fn calculate_transversal<Domain, G>(base: Domain, generators: &Vec<G>) -> (HashM
         }
     }
     (transversals, stabilizers)
-}
-
-fn identity<G>(generators: &Vec<G>) -> G where G: GroupElement {
-    let g = generators.get(0).expect("at least one generator");
-    let inverse = g.inverse();
-    g.times(&inverse)
 }
 
 #[macro_export]

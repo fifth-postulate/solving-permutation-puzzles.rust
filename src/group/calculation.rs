@@ -28,10 +28,12 @@ pub fn elements_generated_by(generators: &Vec<Permutation>) -> Vec<Permutation> 
     elements
 }
 
-fn identity(generators: &Vec<Permutation>) -> Permutation {
-    let a_generator = generators.get(0).expect("at least one generator");
-
-    a_generator.times(&a_generator.inverse())
+/// Calculate an identity element for a set of generators. Assume that set is
+/// non empty, panics otherwise.
+pub fn identity<G>(generators: &Vec<G>) -> G where G: GroupElement {
+    let g = generators.get(0).expect("at least one generator");
+    let inverse = g.inverse();
+    g.times(&inverse)
 }
 
 
