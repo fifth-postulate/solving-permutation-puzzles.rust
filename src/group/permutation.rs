@@ -1,5 +1,55 @@
 //! A permutation is a bijection of a set. Together with function composition
 //! this forms a group.
+//!
+//! # Examples
+//! A permutation is a `GroupElement` and can therefore be multiplied together.
+//! From the following computation it is clear that we compose from left to
+//! right.
+//!
+//! ```rust
+//! use std::collections::HashMap;
+//! use permutation_rs::group::GroupElement;
+//! use permutation_rs::group::permutation::Permutation;
+//!
+//! let mut left_image = HashMap::new();
+//! left_image.insert(0, 1);
+//! left_image.insert(1, 0);
+//! left_image.insert(2, 2);
+//! let left = Permutation::new(left_image);
+//!
+//! let mut right_image = HashMap::new();
+//! right_image.insert(0, 0);
+//! right_image.insert(1, 2);
+//! right_image.insert(2, 1);
+//! let right = Permutation::new(right_image);
+//!
+//! let answer = left.times(&right);
+//!
+//! let mut expected_image = HashMap::new();
+//! expected_image.insert(0, 2);
+//! expected_image.insert(1, 0);
+//! expected_image.insert(2, 1);
+//! let expected = Permutation::new(expected_image);
+//!
+//! assert_eq!(answer, expected);
+//! ```
+//!
+//! Writing the above permutations can get a bit unwieldy. You can use the
+//! `permute!` macro to alleviate the tedium a bit. For example, the `left`
+//! permutation could have been written like this
+//!
+//! ```rust
+//! # #[macro_use] extern crate permutation_rs;
+//! # use std::collections::HashMap;
+//! # use permutation_rs::group::permutation::Permutation;
+//! # fn main() {
+//! let left = permute!(
+//!     0, 1,
+//!     1, 0,
+//!     2, 2
+//! );
+//! # }
+//! ```
 
 use std::collections::HashMap;
 use std::collections::HashSet;
