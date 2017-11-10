@@ -54,7 +54,7 @@ impl<Domain, G> Group<Domain, G>
         let mut gs = generators;
         while gs.len() > 0 {
             let base: Domain = find_base(&gset, &gs).expect("generators should move something");
-            let (level, stabilizers) = BaseStrongGeneratorLevel::new(base, &gs);
+            let (level, stabilizers) = BaseStrongGeneratorLevel::new(base, gs);
             levels.push(level);
             gs = stabilizers;
         }
@@ -65,7 +65,7 @@ impl<Domain, G> Group<Domain, G>
     pub fn size(&self) -> usize {
         self.levels
             .iter()
-            .fold(1usize, |acc, ref level| acc * level.transversal.len() )
+            .fold(1usize, |acc, ref level| acc * level.length() )
     }
 
     /// Determine if a group element is a member of this group.
@@ -105,39 +105,61 @@ fn find_base<Domain, G>(gset: &Vec<Domain>, generators: &Vec<G>) -> Option<Domai
 
 /// A level in the Schreier-Sims Base Strong generator algorithm.
 ///
-/// It can be used to sift
+/// It basically is a SchreierVector with some extra book-keeping. 
 pub struct BaseStrongGeneratorLevel<Domain, G>
     where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> {
     /// The base element for this level.
-    pub base: Domain,
-    /// The transversals for the orbit of the base.
-    transversal: HashMap<Domain, G>,
+    base: Domain,
+    /// Generators that act on the base to form the orbit.
+    generators: Vec<G>,
+    /// A Scheier vector for this base and generators.
+    indices: HashMap<Domain, isize>,
 }
 
 impl<Domain, G> BaseStrongGeneratorLevel<Domain, G>
     where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> {
     /// Create a BaseStrongGeneratorLevel with a known base and generators.
-    pub fn new(base: Domain, generators: &Vec<G>) -> (BaseStrongGeneratorLevel<Domain, G>, Vec<G>) {
-        let (transversal, stabilizers) = calculate_transversal(base.clone(), &generators);
-        (
-            BaseStrongGeneratorLevel  {
-                base: base,
-                transversal: transversal,
-            },
-            stabilizers
-        )
+    pub fn new(base: Domain, generators: Vec<G>) -> (Self, Vec<G>) {
+        let mut to_visit: VecDeque<Domain> = VecDeque::new();
+        let mut indices: HashMap<Domain, isize> = HashMap::new();
+        let mut stabilizers: Vec<G> = vec!();
+        to_visit.push_back(base.clone());
+        indices.insert(base.clone(), -1);
+        while !to_visit.is_empty() {
+            let element = to_visit.pop_front().unwrap();
+            for (index, generator) in generators.iter().enumerate() {
+                let image = generator.act_on(&element);
+                if !indices.contains_key(&image) {
+                    indices.insert(image.clone(), index as isize);
+                    to_visit.push_back(image.clone());
+                } else {
+                    let to = transversal_for(&element, &generators, &indices).unwrap();
+                    let fro = transversal_for(&image, &generators, &indices).unwrap().inverse();
+                    let stabilizer = to.times(&generator).times(&fro);
+                    if !stabilizer.is_identity() {
+                        stabilizers.push(stabilizer);
+                    }
+                }
+            }
+        }
+        (BaseStrongGeneratorLevel { base, generators, indices }, stabilizers)
     }
 
     /// Determine if this levels base is acted upon by `g` in a way compatible for this level.
     pub fn has_transversal_for(&self, g: &G) -> bool {
         let image = g.act_on(&self.base);
-        self.transversal.contains_key(&image)
+        self.indices.contains_key(&image)
     }
 
     /// The transversal corresponding with `g`.
-    pub fn transversal_for(&self, g: &G) -> Option<&G> {
+    pub fn transversal_for(&self, g: &G) -> Option<G> {
         let image = g.act_on(&self.base);
-        self.transversal.get(&image)
+        transversal_for(&image, &self.generators, &self.indices)
+    }
+
+    /// Length of the orbit
+    pub fn length(&self) -> usize {
+        self.indices.len()
     }
 }
 
@@ -213,34 +235,6 @@ fn transversal_for<Domain, G>(start: &Domain, generators: &Vec<G>, indices: &Has
         None
     }
 
-}
-
-fn calculate_transversal<Domain, G>(base: Domain, generators: &Vec<G>) -> (HashMap<Domain, G>, Vec<G>)
-    where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> {
-    let mut to_visit: VecDeque<Domain> = VecDeque::new();
-    let mut transversals: HashMap<Domain, G> = HashMap::new();
-    let mut stabilizers: Vec<G> = vec!();
-    to_visit.push_back(base.clone());
-    transversals.insert(base.clone(), identity(&generators));
-    while !to_visit.is_empty() {
-        let element = to_visit.pop_front().unwrap();
-        for ref generator in generators {
-            let image = generator.act_on(&element);
-            if !transversals.contains_key(&image) {
-                let transversal = transversals.get(&element).unwrap().times(&generator);
-                transversals.insert(image.clone(), transversal);
-                to_visit.push_back(image.clone());
-            } else {
-                let to = transversals.get(&element).unwrap();
-                let fro = transversals.get(&image).unwrap().inverse();
-                let stabilizer = to.times(&generator).times(&fro);
-                if !stabilizer.is_identity() {
-                    stabilizers.push(stabilizer);
-                }
-            }
-        }
-    }
-    (transversals, stabilizers)
 }
 
 #[macro_export]
