@@ -30,12 +30,12 @@ pub struct Word {
 impl Word {
     /// Create the identity element in a free group.
     pub fn identity() -> Word {
-        Word { terms: vec!() }
+        Word::new(vec!())
     }
 
     /// Constructor which creates a single generator.
     pub fn generator(symbol: char) -> Word {
-        Word { terms: vec!((symbol, 1))}
+        Word::new(vec!((symbol, 1)))
     }
 
     /// Create a word with prescribed characters.
