@@ -43,12 +43,12 @@ pub trait GroupAction {
 
 /// The actual group.
 pub struct Group<Domain, G>
-    where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> {
+    where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> + PartialEq {
     levels: Vec<BaseStrongGeneratorLevel<Domain, G>>,
 }
 
 impl<Domain, G> Group<Domain, G>
-    where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> {
+    where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> + PartialEq {
     /// Creates a group with a given set of generators on a certain gset.
     pub fn new(gset: Vec<Domain>, generators: Vec<G>) -> Group<Domain, G> {
         let mut levels = vec!();
@@ -105,7 +105,7 @@ fn find_base<Domain, G>(gset: &Vec<Domain>, generators: &Vec<G>) -> Option<Domai
 }
 
 impl<Domain, G> Display for Group<Domain, G>
-    where Domain: Eq + Hash + Clone + Display, G: GroupElement + GroupAction<Domain=Domain> + Display {
+    where Domain: Eq + Hash + Clone + Display, G: GroupElement + GroupAction<Domain=Domain> + PartialEq + Display {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         write!(f, "<\n")?;
         for level in &self.levels {
@@ -117,9 +117,9 @@ impl<Domain, G> Display for Group<Domain, G>
 
 /// A level in the Schreier-Sims Base Strong generator algorithm.
 ///
-/// It basically is a SchreierVector with some extra book-keeping. 
+/// It basically is a SchreierVector with some extra book-keeping.
 pub struct BaseStrongGeneratorLevel<Domain, G>
-    where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> {
+    where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> + PartialEq {
     /// The base element for this level.
     base: Domain,
     /// Generators that act on the base to form the orbit.
@@ -130,7 +130,7 @@ pub struct BaseStrongGeneratorLevel<Domain, G>
 }
 
 impl<Domain, G> BaseStrongGeneratorLevel<Domain, G>
-    where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> {
+    where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> + PartialEq {
     /// Create a BaseStrongGeneratorLevel with a known base and generators.
     pub fn new(base: Domain, generators: Vec<G>) -> (Self, Vec<G>) {
         let mut to_visit: VecDeque<Domain> = VecDeque::new();
@@ -177,13 +177,13 @@ impl<Domain, G> BaseStrongGeneratorLevel<Domain, G>
 }
 
 fn add_to_stabilizers<Domain, G>(stabilizer: &G, stabilizers: &Vec<G>) -> bool
-    where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> {
-    !stabilizer.is_identity()
+    where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> + PartialEq {
+    !stabilizer.is_identity() && !stabilizers.contains(&stabilizer)
 }
 
 
 impl<Domain, G> Display for BaseStrongGeneratorLevel<Domain, G>
-    where Domain: Eq + Hash + Clone + Display, G: GroupElement + GroupAction<Domain=Domain> + Display {
+    where Domain: Eq + Hash + Clone + Display, G: GroupElement + GroupAction<Domain=Domain> + PartialEq + Display {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         write!(f, "[{};<", self.base)?;
         for g in &self.generators {
