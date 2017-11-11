@@ -149,7 +149,7 @@ impl<Domain, G> BaseStrongGeneratorLevel<Domain, G>
                     let to = transversal_for(&element, &generators, &indices).unwrap();
                     let fro = transversal_for(&image, &generators, &indices).unwrap().inverse();
                     let stabilizer = to.times(&generator).times(&fro);
-                    if !stabilizer.is_identity() {
+                    if add_to_stabilizers(&stabilizer, &stabilizers) {
                         stabilizers.push(stabilizer);
                     }
                 }
@@ -174,6 +174,11 @@ impl<Domain, G> BaseStrongGeneratorLevel<Domain, G>
     pub fn length(&self) -> usize {
         self.indices.len()
     }
+}
+
+fn add_to_stabilizers<Domain, G>(stabilizer: &G, stabilizers: &Vec<G>) -> bool
+    where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> {
+    !stabilizer.is_identity()
 }
 
 
