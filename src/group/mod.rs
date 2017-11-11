@@ -124,7 +124,8 @@ pub struct BaseStrongGeneratorLevel<Domain, G>
     base: Domain,
     /// Generators that act on the base to form the orbit.
     generators: Vec<G>,
-    /// A Scheier vector for this base and generators.
+    /// A [Schreier vector](https://en.wikipedia.org/wiki/Schreier_vector) for
+    /// this base and generators.
     indices: HashMap<Domain, isize>,
 }
 
@@ -189,58 +190,6 @@ impl<Domain, G> Display for BaseStrongGeneratorLevel<Domain, G>
         }
         write!(f, "]\n")
     } 
-}
-
-/// A [Schreier vector](https://en.wikipedia.org/wiki/Schreier_vector) is used
-/// to reduce the storage requirements when calculating orbits and transversals.
-pub struct SchreierVector<Domain, G>
-    where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> {
-    base: Domain,
-    generators: Vec<G>,
-    indices: HashMap<Domain, isize>,
-}
-
-impl<Domain, G> SchreierVector<Domain, G>
-    where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> {
-    /// Create a SchreierVector and the stabilizers.
-    pub fn new(base: Domain, generators: Vec<G>) -> (Self, Vec<G>) {
-        let mut to_visit: VecDeque<Domain> = VecDeque::new();
-        let mut indices: HashMap<Domain, isize> = HashMap::new();
-        let mut stabilizers: Vec<G> = vec!();
-        to_visit.push_back(base.clone());
-        indices.insert(base.clone(), -1);
-        while !to_visit.is_empty() {
-            let element = to_visit.pop_front().unwrap();
-            for (index, generator) in generators.iter().enumerate() {
-                let image = generator.act_on(&element);
-                if !indices.contains_key(&image) {
-                    indices.insert(image.clone(), index as isize);
-                    to_visit.push_back(image.clone());
-                } else {
-                    let to = transversal_for(&element, &generators, &indices).unwrap();
-                    let fro = transversal_for(&image, &generators, &indices).unwrap().inverse();
-                    let stabilizer = to.times(&generator).times(&fro);
-                    if !stabilizer.is_identity() {
-                        stabilizers.push(stabilizer);
-                    }
-                }
-            }
-        }
-        (SchreierVector { base, generators, indices }, stabilizers)
-            
-    }
-
-    /// Determine if this levels base is acted upon by `g` in a way compatible for this level.
-    pub fn has_transversal_for(&self, g: &G) -> bool {
-        let image = g.act_on(&self.base);
-        self.indices.contains_key(&image)
-    }
-
-    /// The transversal corresponding with `g`.
-    pub fn transversal_for(&self, g: &G) -> Option<G> {
-        let image = g.act_on(&self.base);
-        transversal_for(&image, &self.generators, &self.indices)
-    }
 }
 
 fn transversal_for<Domain, G>(start: &Domain, generators: &Vec<G>, indices: &HashMap<Domain, isize>) -> Option<G>
