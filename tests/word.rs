@@ -8,7 +8,8 @@ use permutation_rs::group::tree::SLP;
 use permutation_rs::group::free::Word;
 use permutation_rs::group::permutation::Permutation;
 
-fn main() {
+#[test]
+fn check_returned_word() {
     let group = s6();
 
     let element = SLPPermutation::new(
@@ -27,9 +28,9 @@ fn main() {
 
     let morphism = morphism!(0, 't', 1, 'r');
 
-    println!("{0} {1}",
-             stripped.element.1.inverse(),
-             stripped.transform(&morphism).inverse());
+
+    assert!(stripped.element.1.is_identity());
+    assert_eq!(stripped.transform(&morphism).inverse(), Word::new(vec![('r', 4), ('t', 1), ('r', -5), ('t', -1), ('r', 2), ('t', -1), ('r', 1), ('t', -1), ('r', -3), ('t', 1), ('r', 5), ('t', 1), ('r', -3), ('t', -1), ('r', -1), ('t', 1), ('r', 1), ('t', 1), ('r', 3), ('t', 1), ('r', -2), ('t', 1)]));
 }
 
 fn s6() -> Group<u64, SLPPermutation> {

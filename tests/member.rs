@@ -5,7 +5,8 @@ use std::collections::HashMap;
 use permutation_rs::group::{Group};
 use permutation_rs::group::permutation::Permutation;
 
-fn main() {
+#[test]
+fn check_that_a_certain_permutation_is_an_member() {
     let group = d6();
 
     let element = permute!(
@@ -16,7 +17,7 @@ fn main() {
         4, 3,
         5, 2);
 
-    println!("{0} a member", group.is_member(element));
+    assert!(group.is_member(element));
 }
 
 fn d6() -> Group<u64, Permutation> {
