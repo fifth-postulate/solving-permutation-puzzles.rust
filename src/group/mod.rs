@@ -254,10 +254,10 @@ fn transversal_for<Domain, G>(start: &Domain, generators: &Vec<G>, indices: &Has
             let generator = &generators[(*index as usize)];
             let inverse = generator.inverse();
             image = inverse.act_on(&image);
-            transversal = inverse.times(&transversal);
+            transversal = transversal.times(&inverse);
             index = indices.get(&image).unwrap();
         }
-        Some(transversal)
+        Some(transversal.inverse())
     } else {
         None
     }
@@ -325,6 +325,8 @@ mod tests {
     #[test]
     fn group_should_have_a_size() {
         let group = d3();
+        println!("{}", group);
+
 
         assert_eq!(group.size(), 6);
     }
@@ -340,5 +342,39 @@ mod tests {
         let group = d3();
 
         assert!(group.is_member(transposition));
+    }
+
+    #[test]
+    fn transversal_for_should_correctly_determine_transversal() {
+        let image = 4u64;
+        let mut a_image: HashMap<u64, u64> = HashMap::new();
+        a_image.insert(0u64, 1u64);
+        a_image.insert(1u64, 2u64);
+        a_image.insert(2u64, 0u64);
+        a_image.insert(3u64, 4u64);
+        a_image.insert(4u64, 5u64);
+        a_image.insert(5u64, 3u64);
+        let a = Permutation::new(a_image);
+        let mut b_image: HashMap<u64, u64> = HashMap::new();
+        b_image.insert(0u64, 3u64);
+        b_image.insert(1u64, 1u64);
+        b_image.insert(2u64, 2u64);
+        b_image.insert(3u64, 0u64);
+        b_image.insert(4u64, 4u64);
+        b_image.insert(5u64, 5u64);
+        let b = Permutation::new(b_image);
+        let generators = vec!(a.clone(), b.clone());
+        let mut indices: HashMap<u64, isize> = HashMap::new();
+        indices.insert(0u64, -1isize);
+        indices.insert(1u64, 0isize);
+        indices.insert(2u64, 0isize);
+        indices.insert(3u64, 1isize);
+        indices.insert(4u64, 0isize);
+        indices.insert(5u64, 0isize);
+
+        let transversal = transversal_for(&image, &generators, &indices).unwrap();
+
+        let expected = b.times(&a);
+        assert_eq!(transversal, expected);
     }
 }
