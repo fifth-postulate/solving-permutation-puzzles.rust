@@ -18,6 +18,7 @@ pub mod calculation;
 use std::hash::Hash;
 use std::collections::HashMap;
 use std::collections::VecDeque;
+use std::fmt::{Display, Formatter, Error};
 
 use self::calculation::identity;
 
@@ -103,6 +104,17 @@ fn find_base<Domain, G>(gset: &Vec<Domain>, generators: &Vec<G>) -> Option<Domai
     None
 }
 
+impl<Domain, G> Display for Group<Domain, G>
+    where Domain: Eq + Hash + Clone + Display, G: GroupElement + GroupAction<Domain=Domain> + Display {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+        write!(f, "<\n")?;
+        for level in &self.levels {
+            level.fmt(f)?;
+        }
+        write!(f, ">\n")
+    }
+}
+
 /// A level in the Schreier-Sims Base Strong generator algorithm.
 ///
 /// It basically is a SchreierVector with some extra book-keeping. 
@@ -163,6 +175,21 @@ impl<Domain, G> BaseStrongGeneratorLevel<Domain, G>
     }
 }
 
+
+impl<Domain, G> Display for BaseStrongGeneratorLevel<Domain, G>
+    where Domain: Eq + Hash + Clone + Display, G: GroupElement + GroupAction<Domain=Domain> + Display {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+        write!(f, "[{};<", self.base)?;
+        for g in &self.generators {
+            write!(f, "{}", g)?;
+        }
+        write!(f, ">;")?;
+        for (domain, index) in &self.indices {
+           write!(f, "({}, {})", domain, index)?; 
+        }
+        write!(f, "]\n")
+    } 
+}
 
 /// A [Schreier vector](https://en.wikipedia.org/wiki/Schreier_vector) is used
 /// to reduce the storage requirements when calculating orbits and transversals.
