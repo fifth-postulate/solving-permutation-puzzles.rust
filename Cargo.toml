@@ -5,4 +5,7 @@ version = "2.0.0"
 authors = ["Daan van Berkel <daan.v.berkel.1980@gmail.com>"]
 license = "MIT"
 
+[badges]
+travis-ci = { repository = "fifth-postulate / permutation-rs", branch = "master" }
+
 [dependencies]
