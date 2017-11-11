@@ -1,4 +1,4 @@
-# permutation-rs [![Crate](https://img.shields.io/crates/v/permutation-rs.svg)](https://crates.io/crates/permutation-rs)
+# permutation-rs [![Build Status](https://travis-ci.org/fifth-postulate/solving-permutation-puzzles.rust.svg?branch=master)](https://travis-ci.org/fifth-postulate/solving-permutation-puzzles.rust)[![Crate](https://img.shields.io/crates/v/permutation-rs.svg)](https://crates.io/crates/permutation-rs)
 Rust code to solve permutation puzzles.
 
 ## Tutorial
