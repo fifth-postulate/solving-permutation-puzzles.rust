@@ -130,7 +130,7 @@ mod tests {
     }
 
     #[test]
-    fn permutation_should_display_correctly() {
+    fn should_display_correctly() {
         let identity = SLP::Identity;
         let generator = SLP::Generator(1);
         let product = SLP::Product(
