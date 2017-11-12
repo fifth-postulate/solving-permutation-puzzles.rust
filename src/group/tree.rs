@@ -28,12 +28,13 @@
 //! # }
 //! ```
 
+use std::hash::Hash;
 use std::collections::HashMap;
 use std::rc::Rc;
 use std::cell::{RefMut, RefCell};
 use std::fmt;
 use std::fmt::Display;
-use super::{GroupElement, Morphism};
+use super::{GroupElement, GroupAction, Morphism};
 use super::free::Word;
 
 /// A `SLPElement` keeps track of how a word is formed in a `SLPCollection`.
@@ -151,6 +152,15 @@ impl<G> GroupElement for SLPWord<G> where G: GroupElement + Clone {
         let id = (*collection_ref).register(element);
 
         SLPWord { collection: self.collection.clone(), id }
+    }
+}
+
+impl<Domain, G> GroupAction for SLPWord<G>
+    where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> + Clone {
+    type Domain = Domain;
+
+    fn act_on(&self, element: &Self::Domain) -> Self::Domain {
+        self.evaluate().act_on(&element)
     }
 }
 
