@@ -187,14 +187,14 @@ impl<Domain, G> Display for BaseStrongGeneratorLevel<Domain, G>
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         write!(f, "[{};<", self.base)?;
         for g in &self.generators {
-            write!(f, "{}", g)?;
+            write!(f, " {}", g)?;
         }
-        write!(f, ">;")?;
+        write!(f, " >;")?;
         for (domain, index) in &self.indices {
-           write!(f, "({}, {})", domain, index)?; 
+           write!(f, " {}: {}", domain, index)?;
         }
         write!(f, "]\n")
-    } 
+    }
 }
 
 fn transversal_for<Domain, G>(start: &Domain, generators: &Vec<G>, indices: &HashMap<Domain, isize>) -> Option<G>
