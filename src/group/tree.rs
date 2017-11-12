@@ -49,7 +49,7 @@ pub enum SLPElement {
 
 /// A `SLPCollection` keeps tracks of various words that are build up from each
 /// other.
-pub struct SLPCollection<G> where G: GroupElement {
+pub struct SLPCollection<G> where G: GroupElement + Clone {
     next_id: u64,
     associations: HashMap<u64, SLPElement>,
     evaluator: HashMap<u64, G>,
@@ -133,6 +133,14 @@ impl<G> SLPWord<G> where G: GroupElement + Clone {
     }
 }
 
+impl<G> SLPWord<G> where G: GroupElement + Eq + Hash + Clone {
+    /// Apply a morphism to this element.
+    pub fn transform<H>(&self, morphism: &Morphism<G, H>) -> H where H: GroupElement + Eq + Hash + Clone {
+        morphism.transform(&self.evaluate())
+    }
+}
+
+
 impl<G> GroupElement for SLPWord<G> where G: GroupElement + Clone {
     fn is_identity(&self) -> bool {
         unimplemented!();
@@ -165,7 +173,7 @@ impl<Domain, G> GroupAction for SLPWord<G>
 }
 
 /// An `SLPFactory` creates `SLPWord`s that corresponds with generators.
-pub struct SLPFactory<G> where G: GroupElement {
+pub struct SLPFactory<G> where G: GroupElement + Clone {
     collection: Rc<RefCell<SLPCollection<G>>>,
 }
 
