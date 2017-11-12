@@ -28,10 +28,154 @@
 //! # }
 //! ```
 
+use std::collections::HashMap;
+use std::rc::Rc;
+use std::cell::{RefMut, RefCell};
 use std::fmt;
 use std::fmt::Display;
 use super::{GroupElement, Morphism};
 use super::free::Word;
+
+/// A `SLPElement` keeps track of how a word is formed in a `SLPCollection`.
+pub enum SLPElement {
+    /// The base element, will evaluate to a group element.
+    Generator(u64),
+    /// A product of other words, which will be looked up by id in a `SLPCollection`.
+    Product(u64, u64),
+    /// An inverse of an other word, looked up by id in a `SLPCollection`.
+    Inverse(u64),
+}
+
+/// A `SLPCollection` keeps tracks of various words that are build up from each
+/// other.
+pub struct SLPCollection<G> where G: GroupElement {
+    next_id: u64,
+    associations: HashMap<u64, SLPElement>,
+    evaluator: HashMap<u64, G>,
+}
+
+impl<G> SLPCollection<G> where G: GroupElement + Clone {
+    /// Create a `SLPCollection`
+    pub fn new() -> SLPCollection<G> {
+        SLPCollection {
+            next_id: 0,
+            associations: HashMap::new(),
+            evaluator: HashMap::new(),
+        }
+    }
+
+    /// Register a new word in the collection. Returns the id with which this
+    /// element can be looked up.
+    pub fn register(&mut self, element: SLPElement) -> u64 {
+        let id = self.next_id;
+        self.associations.insert(id, element);
+        self.next_id = id + 1;
+
+        id
+    }
+
+    /// Registers a generator that will evaluate to the group element `g`.
+    /// Return the id with which this `Generator` element can be looked up.
+    pub fn generator(&mut self, g: G) -> u64 {
+        let id = self.next_id;
+        self.associations.insert(id, SLPElement::Generator(id));
+        self.evaluator.insert(id, g);
+        self.next_id = id + 1;
+
+        id
+    }
+
+    fn evaluate(&self, id: &u64) -> Option<G> {
+        if self.associations.contains_key(id) {
+            match *self.associations.get(id).unwrap() {
+                SLPElement::Generator(id) => {
+                    let g = self.evaluator.get(&id).unwrap();
+                    let clone = (*g).clone();
+                    Some(clone)
+                },
+
+                SLPElement::Product(left_id, right_id) => {
+                    let left = self.evaluate(&left_id).unwrap();
+                    let right = self.evaluate(&right_id).unwrap();
+                    let product = left.times(&right);
+
+                    Some(product)
+                },
+
+                SLPElement::Inverse(id) => {
+                    let g = self.evaluate(&id).unwrap();
+
+                    Some(g.inverse())
+                }, 
+            }
+        } else {
+            None
+        }
+    }
+}
+
+/// `SLPWord`s for the actual group elements of a SLP.
+///
+/// To create `SLPWord` generators you need a `SLPFactory`. Otherwise you can
+/// form new words by forming products and taking inverses.
+pub struct SLPWord<G> where G: GroupElement + Clone {
+    collection: Rc<RefCell<SLPCollection<G>>>,
+    id: u64,
+}
+
+impl<G> SLPWord<G> where G: GroupElement + Clone {
+    /// Evaluate this `SLPWord` according to the evaluation setup by
+    /// construction.
+    pub fn evaluate(&self) -> G {
+        let collection_ref = self.collection.borrow();
+        (*collection_ref).evaluate(&self.id).unwrap()
+    }
+}
+
+impl<G> GroupElement for SLPWord<G> where G: GroupElement + Clone {
+    fn is_identity(&self) -> bool {
+        unimplemented!();
+    }
+
+    fn times(&self, multiplicant: &Self) -> Self {
+        let element = SLPElement::Product(self.id, multiplicant.id);
+        let mut collection_ref: RefMut<SLPCollection<G>> = self.collection.borrow_mut();
+        let id = (*collection_ref).register(element);
+
+        SLPWord { collection: self.collection.clone(), id }
+    }
+
+    fn inverse(&self) -> Self {
+        let element = SLPElement::Inverse(self.id);
+        let mut collection_ref: RefMut<SLPCollection<G>> = self.collection.borrow_mut();
+        let id = (*collection_ref).register(element);
+
+        SLPWord { collection: self.collection.clone(), id }
+    }
+}
+
+/// An `SLPFactory` creates `SLPWord`s that corresponds with generators.
+pub struct SLPFactory<G> where G: GroupElement {
+    collection: Rc<RefCell<SLPCollection<G>>>,
+}
+
+impl<G> SLPFactory<G> where G: GroupElement + Clone {
+    /// Create a new `SLPFactory`.
+    pub fn new() -> SLPFactory<G> {
+        let collection = SLPCollection::new();
+
+        SLPFactory { collection: Rc::new(RefCell::new(collection)) }
+    }
+
+    /// Create an `SLPWord` that evaluates to the group element `g`.
+    pub fn generator(&self, g: G) -> SLPWord<G> {
+        let mut collection_ref: RefMut<SLPCollection<G>> = self.collection.borrow_mut();
+        let id = (*collection_ref).generator(g);
+
+        SLPWord { collection: self.collection.clone(), id }
+    }
+}
+
 
 /// Single Line Program (SLP) references various elements to form a expression
 /// That can be evaluated to actual group elements.
