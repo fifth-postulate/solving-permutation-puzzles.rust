@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 use pr::group::GroupElement;
-use pr::group::tree::{SLPFactory, SLPWord};
+use pr::group::tree::SLPFactory;
 use pr::group::permutation::Permutation;
 
 #[test]
