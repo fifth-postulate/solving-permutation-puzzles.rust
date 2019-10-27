@@ -4,6 +4,7 @@ name = "permutation-rs"
 version = "3.0.0"
 authors = ["Daan van Berkel <daan.v.berkel.1980@gmail.com>"]
 license = "MIT"
+repository = "https://github.com/fifth-postulate/solving-permutation-puzzles.rust"
 
 [badges]
 travis-ci = { repository = "fifth-postulate / permutation-rs", branch = "master" }
