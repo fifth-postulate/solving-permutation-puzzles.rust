@@ -17,9 +17,9 @@
 //! let expected = Word::new(vec![('a', 1), ('b', 2), ('c', 1)]);
 //! assert_eq!(answer, expected);
 //! ```
+use super::GroupElement;
 use std::fmt;
 use std::fmt::Display;
-use super::GroupElement;
 
 /// The element of a free group.
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
@@ -30,33 +30,40 @@ pub struct Word {
 impl Word {
     /// Create the identity element in a free group.
     pub fn identity() -> Word {
-        Word::new(vec!())
+        Word::new(vec![])
     }
 
     /// Constructor which creates a single generator.
     pub fn generator(symbol: char) -> Word {
-        Word::new(vec!((symbol, 1)))
+        Word::new(vec![(symbol, 1)])
     }
 
     /// Create a word with prescribed characters.
     pub fn new(elements: Vec<(char, i64)>) -> Word {
-        Word { terms : normalize(&elements) }
+        Word {
+            terms: normalize(&elements),
+        }
     }
 }
 
-
 fn normalize(elements: &Vec<(char, i64)>) -> Vec<(char, i64)> {
-    let mut not_normalized : Vec<(char, i64)> = vec!();
+    let mut not_normalized: Vec<(char, i64)> = vec![];
     not_normalized.extend(elements);
 
     if not_normalized.len() <= 1 {
         not_normalized
     } else {
-        let mut normalized : Vec<(char, i64)> = vec!();
-        let mut current: (char, i64) = not_normalized.get(0).expect("at least two elements").clone();
+        let mut normalized: Vec<(char, i64)> = vec![];
+        let mut current: (char, i64) = not_normalized
+            .get(0)
+            .expect("at least two elements")
+            .clone();
         let mut index = 1;
         while index < not_normalized.len() {
-            let primitive = not_normalized.get(index).expect("index within bound").clone();
+            let primitive = not_normalized
+                .get(index)
+                .expect("index within bound")
+                .clone();
             if current.0 == primitive.0 {
                 current = (current.0.clone(), current.1 + primitive.1)
             } else {
@@ -86,7 +93,7 @@ impl GroupElement for Word {
     }
 
     fn times(&self, multiplicant: &Word) -> Word {
-        let mut terms: Vec<(char, i64)>= vec!();
+        let mut terms: Vec<(char, i64)> = vec![];
         terms.extend(&self.terms);
         terms.extend(&multiplicant.terms);
         let terms = normalize(&terms);
@@ -94,7 +101,7 @@ impl GroupElement for Word {
     }
 
     fn inverse(&self) -> Word {
-        let mut terms: Vec<(char, i64)>  = vec!();
+        let mut terms: Vec<(char, i64)> = vec![];
         terms.extend(&self.terms);
         terms.reverse();
         for element in terms.iter_mut() {
@@ -140,14 +147,14 @@ mod tests {
 
         let product = first.times(&second);
 
-        let expected = Word::new(vec!(('g', 1), ('h',1)));
+        let expected = Word::new(vec![('g', 1), ('h', 1)]);
 
         assert_eq!(product, expected);
     }
 
     #[test]
     fn inverse_should_multiply_to_identity() {
-        let first = Word::new(vec!(('g', 1), ('h',1)));
+        let first = Word::new(vec![('g', 1), ('h', 1)]);
 
         let second = first.inverse();
 
@@ -155,12 +162,12 @@ mod tests {
 
         assert!(product.is_identity());
     }
-    
+
     #[test]
     fn word_should_display_correctly() {
         let identity = Word::identity();
 
-        let word = Word::new(vec!(('x', 2), ('y', -3), ('x', -2), ('y', 3)));
+        let word = Word::new(vec![('x', 2), ('y', -3), ('x', -2), ('y', 3)]);
 
         assert_eq!("Id", format!("{}", identity));
         assert_eq!("x^2y^-3x^-2y^3", format!("{}", word));

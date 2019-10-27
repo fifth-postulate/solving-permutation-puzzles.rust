@@ -28,14 +28,14 @@
 //! # }
 //! ```
 
-use std::hash::Hash;
+use super::free::Word;
+use super::{GroupAction, GroupElement, Morphism};
+use std::cell::{RefCell, RefMut};
 use std::collections::HashMap;
-use std::rc::Rc;
-use std::cell::{RefMut, RefCell};
 use std::fmt;
 use std::fmt::Display;
-use super::{GroupElement, GroupAction, Morphism};
-use super::free::Word;
+use std::hash::Hash;
+use std::rc::Rc;
 
 /// A `SLPElement` keeps track of how a word is formed in a `SLPCollection`.
 pub enum SLPElement {
@@ -49,13 +49,19 @@ pub enum SLPElement {
 
 /// A `SLPCollection` keeps tracks of various words that are build up from each
 /// other.
-pub struct SLPCollection<G> where G: GroupElement + Clone {
+pub struct SLPCollection<G>
+where
+    G: GroupElement + Clone,
+{
     next_id: u64,
     associations: HashMap<u64, SLPElement>,
     evaluator: HashMap<u64, G>,
 }
 
-impl<G> SLPCollection<G> where G: GroupElement + Clone {
+impl<G> SLPCollection<G>
+where
+    G: GroupElement + Clone,
+{
     /// Create a `SLPCollection`
     pub fn new() -> SLPCollection<G> {
         SLPCollection {
@@ -93,7 +99,7 @@ impl<G> SLPCollection<G> where G: GroupElement + Clone {
                     let g = self.evaluator.get(&id).unwrap();
                     let clone = (*g).clone();
                     Some(clone)
-                },
+                }
 
                 SLPElement::Product(left_id, right_id) => {
                     let left = self.evaluate(&left_id).unwrap();
@@ -101,13 +107,13 @@ impl<G> SLPCollection<G> where G: GroupElement + Clone {
                     let product = left.times(&right);
 
                     Some(product)
-                },
+                }
 
                 SLPElement::Inverse(id) => {
                     let g = self.evaluate(&id).unwrap();
 
                     Some(g.inverse())
-                }, 
+                }
             }
         } else {
             None
@@ -119,12 +125,18 @@ impl<G> SLPCollection<G> where G: GroupElement + Clone {
 ///
 /// To create `SLPWord` generators you need a `SLPFactory`. Otherwise you can
 /// form new words by forming products and taking inverses.
-pub struct SLPWord<G> where G: GroupElement + Clone {
+pub struct SLPWord<G>
+where
+    G: GroupElement + Clone,
+{
     collection: Rc<RefCell<SLPCollection<G>>>,
     id: u64,
 }
 
-impl<G> SLPWord<G> where G: GroupElement + Clone {
+impl<G> SLPWord<G>
+where
+    G: GroupElement + Clone,
+{
     /// Evaluate this `SLPWord` according to the evaluation setup by
     /// construction.
     pub fn evaluate(&self) -> G {
@@ -133,15 +145,23 @@ impl<G> SLPWord<G> where G: GroupElement + Clone {
     }
 }
 
-impl<G> SLPWord<G> where G: GroupElement + Eq + Hash + Clone {
+impl<G> SLPWord<G>
+where
+    G: GroupElement + Eq + Hash + Clone,
+{
     /// Apply a morphism to this element.
-    pub fn transform<H>(&self, morphism: &Morphism<G, H>) -> H where H: GroupElement + Eq + Hash + Clone {
+    pub fn transform<H>(&self, morphism: &Morphism<G, H>) -> H
+    where
+        H: GroupElement + Eq + Hash + Clone,
+    {
         morphism.transform(&self.evaluate())
     }
 }
 
-
-impl<G> GroupElement for SLPWord<G> where G: GroupElement + Clone {
+impl<G> GroupElement for SLPWord<G>
+where
+    G: GroupElement + Clone,
+{
     fn is_identity(&self) -> bool {
         unimplemented!();
     }
@@ -151,7 +171,10 @@ impl<G> GroupElement for SLPWord<G> where G: GroupElement + Clone {
         let mut collection_ref: RefMut<SLPCollection<G>> = self.collection.borrow_mut();
         let id = (*collection_ref).register(element);
 
-        SLPWord { collection: self.collection.clone(), id }
+        SLPWord {
+            collection: self.collection.clone(),
+            id,
+        }
     }
 
     fn inverse(&self) -> Self {
@@ -159,12 +182,18 @@ impl<G> GroupElement for SLPWord<G> where G: GroupElement + Clone {
         let mut collection_ref: RefMut<SLPCollection<G>> = self.collection.borrow_mut();
         let id = (*collection_ref).register(element);
 
-        SLPWord { collection: self.collection.clone(), id }
+        SLPWord {
+            collection: self.collection.clone(),
+            id,
+        }
     }
 }
 
 impl<Domain, G> GroupAction for SLPWord<G>
-    where Domain: Eq + Hash + Clone, G: GroupElement + GroupAction<Domain=Domain> + Clone {
+where
+    Domain: Eq + Hash + Clone,
+    G: GroupElement + GroupAction<Domain = Domain> + Clone,
+{
     type Domain = Domain;
 
     fn act_on(&self, element: &Self::Domain) -> Self::Domain {
@@ -173,16 +202,24 @@ impl<Domain, G> GroupAction for SLPWord<G>
 }
 
 /// An `SLPFactory` creates `SLPWord`s that corresponds with generators.
-pub struct SLPFactory<G> where G: GroupElement + Clone {
+pub struct SLPFactory<G>
+where
+    G: GroupElement + Clone,
+{
     collection: Rc<RefCell<SLPCollection<G>>>,
 }
 
-impl<G> SLPFactory<G> where G: GroupElement + Clone {
+impl<G> SLPFactory<G>
+where
+    G: GroupElement + Clone,
+{
     /// Create a new `SLPFactory`.
     pub fn new() -> SLPFactory<G> {
         let collection = SLPCollection::new();
 
-        SLPFactory { collection: Rc::new(RefCell::new(collection)) }
+        SLPFactory {
+            collection: Rc::new(RefCell::new(collection)),
+        }
     }
 
     /// Create an `SLPWord` that evaluates to the group element `g`.
@@ -190,10 +227,12 @@ impl<G> SLPFactory<G> where G: GroupElement + Clone {
         let mut collection_ref: RefMut<SLPCollection<G>> = self.collection.borrow_mut();
         let id = (*collection_ref).generator(g);
 
-        SLPWord { collection: self.collection.clone(), id }
+        SLPWord {
+            collection: self.collection.clone(),
+            id,
+        }
     }
 }
-
 
 /// Single Line Program (SLP) references various elements to form a expression
 /// That can be evaluated to actual group elements.
@@ -215,7 +254,9 @@ impl SLP {
         match *self {
             SLP::Identity => Word::identity(),
             ref g @ SLP::Generator(_) => morphism.transform(&g),
-            SLP::Product(ref left, ref right) => (*left).transform(&morphism).times(&(*right).transform(&morphism)),
+            SLP::Product(ref left, ref right) => (*left)
+                .transform(&morphism)
+                .times(&(*right).transform(&morphism)),
             SLP::Inverse(ref g) => (*g).transform(&morphism).inverse(),
         }
     }
@@ -295,15 +336,12 @@ mod tests {
     fn should_display_correctly() {
         let identity = SLP::Identity;
         let generator = SLP::Generator(1);
-        let product = SLP::Product(
-            Box::new(SLP::Generator(1)),
-            Box::new(SLP::Generator(2)));
+        let product = SLP::Product(Box::new(SLP::Generator(1)), Box::new(SLP::Generator(2)));
         let inverse = SLP::Inverse(Box::new(SLP::Generator(1)));
-
 
         assert_eq!("Id", format!("{}", identity));
         assert_eq!("G_1", format!("{}", generator));
         assert_eq!("(G_1) * (G_2)", format!("{}", product));
-        assert_eq!("(G_1)^-1", format!("{}",  inverse));
+        assert_eq!("(G_1)^-1", format!("{}", inverse));
     }
 }

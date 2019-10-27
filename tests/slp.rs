@@ -1,9 +1,10 @@
-#[macro_use] extern crate permutation_rs as pr;
+#[macro_use]
+extern crate permutation_rs as pr;
 
-use std::collections::HashMap;
-use pr::group::GroupElement;
-use pr::group::tree::SLPFactory;
 use pr::group::permutation::Permutation;
+use pr::group::tree::SLPFactory;
+use pr::group::GroupElement;
+use std::collections::HashMap;
 
 #[test]
 fn should_correctly_evaluate_to_elements() {

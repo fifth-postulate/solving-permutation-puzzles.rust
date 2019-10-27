@@ -51,11 +51,11 @@
 //! # }
 //! ```
 
+use super::{GroupAction, GroupElement};
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::fmt;
 use std::fmt::Display;
-use super::{GroupElement, GroupAction};
 
 /// Creates a permutation by specifiying images
 ///
@@ -94,7 +94,10 @@ impl Permutation {
     /// Create an permutation with a given image.
     pub fn new(images: HashMap<u64, u64>) -> Permutation {
         let n = images.len();
-        Permutation { images: images, n: n }
+        Permutation {
+            images: images,
+            n: n,
+        }
     }
 }
 
@@ -104,14 +107,18 @@ impl GroupElement for Permutation {
             let original = i as u64;
             let image = self.images.get(&original).unwrap_or(&original).clone();
             if image != original {
-                return false
+                return false;
             }
         }
         true
     }
 
     fn times(&self, multiplicant: &Permutation) -> Permutation {
-        let max_n = if self.n > multiplicant.n { self.n } else { multiplicant.n };
+        let max_n = if self.n > multiplicant.n {
+            self.n
+        } else {
+            multiplicant.n
+        };
         let mut images = HashMap::new();
         for i in 0..max_n {
             let original = i as u64;
@@ -146,8 +153,7 @@ impl Display for Permutation {
         let cycles: Vec<Vec<u64>> = cycles(self.n, &self.images);
         if cycles.len() > 0 {
             for cycle in cycles {
-                let representations: Vec<String> =
-                    cycle
+                let representations: Vec<String> = cycle
                     .into_iter()
                     .map(|element| format!("{}", element))
                     .collect();
@@ -164,13 +170,13 @@ impl Display for Permutation {
 }
 
 fn cycles(n: usize, images: &HashMap<u64, u64>) -> Vec<Vec<u64>> {
-    let mut cycles = vec!();
+    let mut cycles = vec![];
     let mut visited = HashSet::new();
     for i in 0..n {
         let original = i as u64;
         if !visited.contains(&original) {
             visited.insert(original.clone());
-            let mut cycle = vec!(original.clone());
+            let mut cycle = vec![original.clone()];
             let mut image = images.get(&original).unwrap_or(&original).clone();
             while !visited.contains(&image) {
                 visited.insert(image.clone());
@@ -187,9 +193,9 @@ fn cycles(n: usize, images: &HashMap<u64, u64>) -> Vec<Vec<u64>> {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-    use super::super::{GroupElement, GroupAction};
+    use super::super::{GroupAction, GroupElement};
     use super::*;
+    use std::collections::HashMap;
 
     #[test]
     fn permutaion_should_know_when_it_is_the_identity() {

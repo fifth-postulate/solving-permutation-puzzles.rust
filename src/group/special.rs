@@ -1,21 +1,23 @@
 //! Home for special groups.
 
-use super::{GroupElement, GroupAction, Morphism};
-use super::tree::SLP;
-use super::permutation::Permutation;
 use super::free::Word;
+use super::permutation::Permutation;
+use super::tree::SLP;
+use super::{GroupAction, GroupElement, Morphism};
 
 /// A special product of a `SLP` and a `Permutation`.
 #[derive(Debug, PartialEq)]
 pub struct SLPPermutation {
     /// The product of a SLP and a Permutation.
-    pub element : (SLP, Permutation),
+    pub element: (SLP, Permutation),
 }
 
 impl SLPPermutation {
     /// Create an `SLPPermutation`.
     pub fn new(slp: SLP, permutation: Permutation) -> SLPPermutation {
-        SLPPermutation { element : (slp, permutation) }
+        SLPPermutation {
+            element: (slp, permutation),
+        }
     }
 
     /// Map the `SLPPermutation` in to a `Word` according to the `Morphism`.
@@ -32,13 +34,12 @@ impl GroupElement for SLPPermutation {
     fn times(&self, multiplicant: &SLPPermutation) -> SLPPermutation {
         SLPPermutation::new(
             self.element.0.times(&multiplicant.element.0),
-            self.element.1.times(&multiplicant.element.1))
+            self.element.1.times(&multiplicant.element.1),
+        )
     }
 
     fn inverse(&self) -> SLPPermutation {
-        SLPPermutation::new(
-            self.element.0.inverse(),
-            self.element.1.inverse())
+        SLPPermutation::new(self.element.0.inverse(), self.element.1.inverse())
     }
 }
 
@@ -52,29 +53,27 @@ impl GroupAction for SLPPermutation {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-    use super::super::{GroupElement, GroupAction};
-    use super::super::tree::SLP;
     use super::super::permutation::Permutation;
+    use super::super::tree::SLP;
+    use super::super::{GroupAction, GroupElement};
     use super::SLPPermutation;
+    use std::collections::HashMap;
 
     #[test]
     fn slp_permutaion_should_know_when_it_is_the_identity() {
         let mut not_identity_images = HashMap::new();
         not_identity_images.insert(0u64, 1u64);
         not_identity_images.insert(1u64, 0u64);
-        let not_identity: SLPPermutation = SLPPermutation::new(
-            SLP::Generator(1),
-            Permutation::new(not_identity_images));
+        let not_identity: SLPPermutation =
+            SLPPermutation::new(SLP::Generator(1), Permutation::new(not_identity_images));
 
         assert!(!not_identity.is_identity());
 
         let mut identity_images = HashMap::new();
         identity_images.insert(0u64, 0u64);
         identity_images.insert(1u64, 1u64);
-        let identity: SLPPermutation = SLPPermutation::new(
-            SLP::Identity,
-            Permutation::new(identity_images));
+        let identity: SLPPermutation =
+            SLPPermutation::new(SLP::Identity, Permutation::new(identity_images));
 
         assert!(identity.is_identity());
     }
@@ -85,17 +84,15 @@ mod tests {
         first_images.insert(0u64, 1u64);
         first_images.insert(1u64, 0u64);
         first_images.insert(2u64, 2u64);
-        let first: SLPPermutation = SLPPermutation::new(
-            SLP::Generator(1),
-            Permutation::new(first_images));
+        let first: SLPPermutation =
+            SLPPermutation::new(SLP::Generator(1), Permutation::new(first_images));
 
         let mut second_images = HashMap::new();
         second_images.insert(0u64, 0u64);
         second_images.insert(1u64, 2u64);
         second_images.insert(2u64, 1u64);
-        let second: SLPPermutation = SLPPermutation::new(
-            SLP::Generator(2),
-            Permutation::new(second_images));
+        let second: SLPPermutation =
+            SLPPermutation::new(SLP::Generator(2), Permutation::new(second_images));
 
         let product = first.times(&second);
 
@@ -105,7 +102,8 @@ mod tests {
         expected_images.insert(2u64, 1u64);
         let expected: SLPPermutation = SLPPermutation::new(
             SLP::Product(Box::new(SLP::Generator(1)), Box::new(SLP::Generator(2))),
-            Permutation::new(expected_images));
+            Permutation::new(expected_images),
+        );
 
         assert_eq!(product, expected);
     }
@@ -116,9 +114,8 @@ mod tests {
         first_images.insert(0u64, 1u64);
         first_images.insert(1u64, 2u64);
         first_images.insert(2u64, 0u64);
-        let first: SLPPermutation = SLPPermutation::new(
-            SLP::Generator(1),
-            Permutation::new(first_images));
+        let first: SLPPermutation =
+            SLPPermutation::new(SLP::Generator(1), Permutation::new(first_images));
 
         let second = first.inverse();
 
@@ -133,9 +130,8 @@ mod tests {
         permutation_images.insert(0u64, 1u64);
         permutation_images.insert(1u64, 2u64);
         permutation_images.insert(2u64, 0u64);
-        let permutation: SLPPermutation = SLPPermutation::new(
-            SLP::Generator(1),
-            Permutation::new(permutation_images));
+        let permutation: SLPPermutation =
+            SLPPermutation::new(SLP::Generator(1), Permutation::new(permutation_images));
 
         assert_eq!(permutation.act_on(&0u64), 1u64);
         assert_eq!(permutation.act_on(&1u64), 2u64);
