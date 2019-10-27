@@ -57,6 +57,19 @@ use std::fmt;
 use std::fmt::Display;
 use super::{GroupElement, GroupAction};
 
+/// Creates a permutation by specifiying images
+///
+/// ```rust
+/// # #[macro_use] extern crate permutation_rs;
+/// # use std::collections::HashMap;
+/// # use permutation_rs::group::permutation::Permutation;
+/// # fn main() {
+/// let a_permutation = permute!(
+///     0, 1,
+///     1, 0,
+///     2, 2
+/// );
+/// # }
 #[macro_export]
 macro_rules! permute {
     ( $($from: expr, $to: expr),* ) => {

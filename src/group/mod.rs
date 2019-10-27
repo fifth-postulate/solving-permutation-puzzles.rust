@@ -218,6 +218,7 @@ fn transversal_for<Domain, G>(start: &Domain, generators: &Vec<G>, indices: &Has
 
 }
 
+/// Create a Morphism by specifying images
 #[macro_export]
 macro_rules! morphism {
     ( $($from: expr, $to: expr),* ) => {
